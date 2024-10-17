@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <title>quizknock</title>
+</head>
+
+<body>
+    <header class="title">
+        <h1 id="test">QuizKnock</h1>
+        <h1>~令和のクイズ王に俺はなる~</h1>
+        <div class="difficult">
+            <ul>
+                <li class="dif-btn green">Easy</li>
+                <li class="dif-btn yellow">Normal</li>
+                <li class="dif-btn red">HARD</li><br>
+                <li class="dif-btn" id="music">イントロドンもどき</li>
+            </ul>
+    </header>
+
+    <div id="quiz-container">
+        <h2 id="question">ここに質問が表示されます</h2>
+        <div id="media-container"></div>
+        <div id="options">
+            <!-- ここに選択肢ボタンが動的に追加される -->
+        </div>
+
+        <ul class="hp">
+            <li class="hp-item"><img src="img/hp.png" alt=""></li>
+            <li class="hp-item"><img src="img/hp.png" alt=""></li>
+            <li class="hp-item"><img src="img/hp.png" alt=""></li>
+        </ul>
+
+        <h2 id="timer"></h2>
+
+        <audio id="audio" src="sound/quiz-music.mp3" loop></audio>
+        <button id="btn" type="button"><span>再生</span><span>停止<span></button>
+
+        <div>
+
+            <audio id="sound">
+
+            </audio>
+        </div>
+    </div>
+    <footer>
+        <h1>株式会社ゲームアカデミー</h1>
+    </footer>
+
+    <script>
+
+        const quizData1 = [
+            { question: "イチゴの種はどこについているでしょう？", options: ["外側", "内側", "茎", "根"], answer: "外側" },
+            { question: "カボチャの原産地はどこでしょう？", options: ["アメリカ", "日本", "オーストラリア", "ブラジル"], answer: "アメリカ" },
+            { question: "日本で一番面積が広い都道府県は？", options: ["北海道", "東京都", "大阪府", "沖縄県"], answer: "北海道" },
+            { question: "一円玉の重さはどれくらい？", options: ["1g", "5g", "10g", "0.5g"], answer: "1g" },
+            { question: "日本の紙幣に描かれている肖像画は誰が選んでいる？", options: ["総理大臣", "財務省", "天皇", "国民投票"], answer: "財務省" }
+        ];
+
+        const quizData2 = [
+            { question: "赤道直下の国でクリスマスはいつ祝われるでしょう？", options: ["12月25日", "1月1日", "6月25日", "3月3日"], answer: "12月25日" },
+            { question: "金魚すくいで使う道具の正式名称は？", options: ["ポイ", "すくい網", "スクープ", "サークル"], answer: "ポイ" },
+            { question: "カップラーメンが世界で初めて発売された国はどこ？", options: ["日本", "韓国", "アメリカ", "中国"], answer: "日本" },
+            { question: "カニの血の色は何色？", options: ["青色", "赤色", "透明", "緑色"], answer: "青色" },
+            { question: "オーストラリアのコアラの指紋は何と似ている？", options: ["人間", "カンガルー", "クジラ", "ゾウ"], answer: "人間" }
+        ];
+
+
+        const quizData3 = [
+            { question: "キリンの睡眠時間は1日平均どれくらい？", options: ["2時間", "30分", "5時間", "8時間"], answer: "30分" },
+            { question: "蚊に刺されやすい血液型は何型と言われている？", options: ["O型", "A型", "B型", "AB型"], answer: "O型" },
+            { question: "世界で最も多く話されている言語は何語？", options: ["英語", "スペイン語", "中国語", "ヒンディー語"], answer: "中国語" },
+            { question: "地球の大気の中で最も多い成分は？", options: ["酸素", "窒素", "二酸化炭素", "アルゴン"], answer: "窒素" },
+            { question: "日本で最も広い湖は？", options: ["琵琶湖", "霞ヶ浦", "浜名湖", "十和田湖"], answer: "琵琶湖" }
+        ];
+
+
+        const quizData4 = [
+            { question: "この曲なーんだ", videos: "videos/HANABI.mp4", options: ["Sign", "名もなき詩", "GIFT", "HANABI"], answer: "HANABI" }
+        ];
+
+        const successAudio = '<audio autoplay><source src="sound/success.mp3" type="audio/mp3"></audio>';
+        const failedAudio = '<audio autoplay><source src="sound/failed.mp3" type="audio/mp3"></audio>';
+        const gameover = '<audio autoplay><source src="sound/failed.mp3" type="audio/mp3"></audio>';
+        const success = '<img id="success" src="img/success.png">';
+        const failed = '<img id="failed" src="img/failed.png">';
+        const resethp = `
+            <li class="hp-item"><img src="img/hp.png" alt=""></li>
+            <li class="hp-item"><img src="img/hp.png" alt=""></li>
+            <li class="hp-item"><img src="img/hp.png" alt=""></li>
+            `;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedQuizData = quizData1;
+        let timer = 0;
+        let timeleft;
+        let hp = 3;
+
+        $(document).ready(function () {
+            $(".green").on("click", function () {
+                selectedQuizData = quizData1;
+                currentQuestionIndex = 0;
+                score = 0; // スコアをリセット
+                hp = 3;
+                $(".hp").empty();
+                $(".hp").append(resethp);
+                showQuestion(); // 最初の問題を表示
+            });
+
+            $(".yellow").on("click", function () {
+                selectedQuizData = quizData2;
+                currentQuestionIndex = 0;
+                score = 0; // スコアをリセット
+                hp = 3;
+                $(".hp").empty();
+                $(".hp").append(resethp);
+                showQuestion(); // 最初の問題を表示
+            });
+
+            $(".red").on("click", function () {
+                selectedQuizData = quizData3;
+                currentQuestionIndex = 0;
+                score = 0; // スコアをリセット
+                hp = 3;
+                $(".hp").empty();
+                $(".hp").append(resethp);
+                showQuestion(); // 最初の問題を表示
+            });
+
+            $("#music").on("click", function () {
+                selectedQuizData = quizData4;
+                currentQuestionIndex = 0;
+                score = 0; // スコアをリセット
+                hp = 3;
+                $(".hp").empty();
+                $(".hp").append(resethp);
+                showQuestion(); // 最初の問題を表示
+            });
+
+            showQuestion(); // 最初の問題を表示
+        });
+
+        // 質問を表示する関数
+        function showQuestion() {
+            let currentQuestion = selectedQuizData[currentQuestionIndex];
+
+            $("#question").text(currentQuestion.question);
+            $("#options").empty();
+            $("#media-container").empty();
+
+            if (currentQuestion.videos) {
+                $("#media-container").append(`
+        <video controls style="max-width:100%; height: 200px;">
+            <source src="${currentQuestion.videos}" type="video/mp4">
+        </video>
+        `);
+            }
+
+            currentQuestion.options.forEach(option => {
+                const $button = $("<button>").text(option).addClass("option-button");
+                $("#options").append($button);
+                $button.on("click", () => checkAnswer(option));
+            });
+
+            startTimer();
+
+        }
+
+//残り時間を表示する関数
+        function startTimer() {
+            timeleft = 10;
+            $("#timer").text(`残り時間${timeleft}秒！`);
+
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeleft--;
+                $("#timer").text(`残り時間${timeleft}秒！`);
+
+                if (timeleft <= 0) {
+                    currentQuestionIndex++;
+                    $(".hp-item:first").remove();
+                    hp--;
+                    $("#sound").html(failedAudio);
+                    if (currentQuestionIndex < selectedQuizData.length && hp > 0) {
+                        currentQuestionIndex++;
+                        showQuestion();
+                    } else {
+                        $(".hp-item:first").remove();
+                        alert(`あなたのスコアは${score}点です`);
+                        currentQuestionIndex = 0;
+                        score = 0;
+                        currentQuestionIndex = 0;
+                        score = 0;
+                        hp = 3;
+                        $(".hp").append(resethp);
+                        showQuestion();
+                    }
+                }
+            }, 1000);
+        }
+
+
+        function checkAnswer(selectedOption) {
+            const currentQuestion = selectedQuizData[currentQuestionIndex];
+
+            if (selectedOption === currentQuestion.answer) {
+                $("#quiz-container").children().eq(0).after('<div id="result">' + success + '</div>');
+                $("#sound").html(successAudio);
+                score++; // 正解時のスコア加算
+            } else {
+                $("#quiz-container").children().eq(0).after('<div id="result">' + failed + '</div>');
+                $("#sound").html(failedAudio);
+                $(".hp-item:first").remove();
+                hp--;
+
+            }
+
+            $("#result").fadeOut(1500, function () {
+                $("#result").remove();
+                currentQuestionIndex++;
+
+                if (currentQuestionIndex < selectedQuizData.length && hp > 0) {
+                    showQuestion();
+                } else {
+                    alert(`クイズ終了！あなたのスコアは${score}点です`);
+                    currentQuestionIndex = 0;
+                    score = 0;
+                    hp = 3;
+                    $(".hp").append(resethp);
+                    showQuestion();
+                }
+            });
+        }
+
+        // 音楽再生停止ボタン
+        $(function () {
+            let audio = $("#audio").get(0);
+            let playFlg = false;
+
+            $("#btn").on("click", function () {
+                if (playFlg) {
+                    audio.pause();
+                } else {
+                    audio.play();
+                }
+            });
+
+            audio.onplaying = function () {
+                playFlg = true;
+            };
+            audio.onpause = function () {
+                playFlg = false;
+            };
+        });
+    </script>
+</body>
+</html>

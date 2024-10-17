@@ -1,0 +1,96 @@
+.title {
+    border:3px solid green;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#quiz-container {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+    align-items: center;
+    flex-direction: column;
+    background-color: white;
+    border: 5px solid gray;
+    width: 50%;
+    height: 600px;
+    margin-bottom: 100px;
+}
+
+.difficult ul {
+    display: flex;
+}
+
+.dif-btn {
+    display: flex;
+    margin-right: 20px;
+    border: 2px solid black;
+    border-radius: 2px;
+    width: 100px;
+    font-weight: bold;
+    background-color: gray;
+    margin-bottom: 40px;
+    justify-content: center;
+    align-items: center;
+}
+
+.green:hover {
+    background-color: green;
+    transform: translateY(-5px);
+}
+.yellow:hover {
+    background-color: yellow;
+    transform: translateY(-5px);
+}
+.red:hover {
+    background-color: red;
+    transform: translateY(-5px);
+}
+
+#music:hover {
+    background-color: blue;
+    transform: translateY(-5px);
+}
+
+.option-button {
+    margin-right: 20px;
+    border: 2px solid black;
+    border-radius: 2px;
+    width: 100px;
+    font-weight: bold;
+    background-color: gray;
+    margin-bottom: 40px;
+}
+
+.option-button:hover {
+    background-color: aqua;
+    transform: translateY(-5px);
+}
+
+footer {
+    font-size: 20px;
+    border: 2px solid gray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hp {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 40px;
+}
+
+.hp-item {
+    display: flex;
+    list-style: none;
+}
+
+.hp-item img {
+    width: 30px;
+    height: 30px;
+}
