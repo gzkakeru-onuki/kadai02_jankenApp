@@ -7,7 +7,7 @@ QuizKnock~令和のクイズ王に俺はなる~
 　　　全問正解目指して頑張ろうー！
 
 ## ③アプリのデプロイURL
-デプロイ予定です；；
+https://gzkakeru-onuki.github.io/kadai02_jankenApp/
 
 ## ④アプリのログイン用IDまたはPassword（ある場合）
 なし
